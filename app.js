@@ -1,4 +1,5 @@
-//Definiciones de clases y métodos
+/////////////Definiciones de clases y métodos///////////////
+//Definicion clase de cada producto
 class Producto {
     constructor (id, nombre, marca, talles, stock, precio){
         this.id=id;
@@ -9,9 +10,45 @@ class Producto {
         this.precio=precio;
     }
 }
+
+//Definicion de la clase de la lista de productos y los metodos que la utilizan
+class ProductHandler{
+    constructor(){
+        this.listaProductos = []
+    }
+    mostrarStock(id){
+        const index=this.listaProductos.findIndex(producto=>producto.id==id)
+        console.log(index);
+        if(id!=0){
+            console.log(`
+            ID: ${this.listaProductos[index].id}\n
+            Nombre: ${this.listaProductos[index].nombre}\n
+            Marca: ${this.listaProductos[index].marca}\n
+            Stock:\n
+            Talle (cantidad):
+
+            `);
+        }
+    }
+    agregarStock(){
+        const id= prompt("Coloque el ID del producto a agregar")
+        const existencia = this.listaProductos.find(producto => producto.id==id)
+        console.log(existencia)
+        if(existencia){
+            //Agrega stock a un producto existe
+            const talle = prompt("Indique la talle que desee agregar el stock")
+            const cantidad =parseInt(prompt("Indique la cantidad de unidades a agregar de ese talle"))
+            existencia.stock[existencia.talles.findIndex(talleI=>talleI==talle)]+=cantidad
+            console.log(existencia);
+        }
+        else
+            console.log("Se encontro el ID");
+        
+    }
+}
 //Base de datos del stock
 //                        ID      NOMBRE                   MARCA          TALLE             STOCK         PRECIO                  
-let prod1=new Producto  ( 1,   "AirMaxE xcee",            "Nike",     [39,40,41,42],      [10,5,6,7],     49000)
+let prod1=new Producto  ( 1,   "AirMax Excee",            "Nike",     [39,40,41,42],      [10,5,6,7],     49000)
 let prod2=new Producto  ( 2,   "Legend Essential",        "Nike",     [38,39,41,42,43],   [1,5,8,10,4],   31200)
 let prod3=new Producto  ( 3,   "Downshifter",             "Nike",     [39,40,41],         [3,4,1],        30800)
 let prod4=new Producto  ( 4,   "Revolution 6 Next Nature","Nike",     [40,42],            [9,10],         27000)
@@ -31,45 +68,44 @@ let prod17=new Producto (17,   "Corigliano",              "Diadora",  [39,42,43]
 let prod18=new Producto (18,   "Graviton Pro",            "Puma",     [40,42],            [5,5],          28600)
 let prod19=new Producto (19,   "Solarsmash Rct",          "Puma",     [35,36,37,38],      [8,8,5,3],      28600)
 let prod20=new Producto (20,   "Gel-Rebound",             "Asics",    [40,41,42],         [3,3,3],        25800)
-class ProductHandler{
-    constructor(){
-        this.listaProductos = []
-    }
-}
+
+
+
 //Creo y cargo el objeto que contara con un array que poseerá dentro la lista de todos los objetos producto de la "base de datos"
 let productos = new ProductHandler
 productos.listaProductos=[prod1,prod2,prod3,prod4,prod5,prod6,prod7,prod8,prod9,prod10,prod11,prod12,prod13,prod14,prod15,prod16,prod17,prod18,prod19,prod20]
 console.log(productos)
+productos.mostrarStock(15)
+//productos.agregarStock(30)
+// //Logica del programa 
+// alert(  "Simulador de E-Commerce:\n")
+// let option
+// //Logica del menú
+// do{
+//         //MENU INICIAL
+//     option = prompt(" Escriba el número de la opción que desee realizar:\n"+
+//                     "  1- Agregar Stock\n"+
+//                     "  2- Seleccionar productos a comprar\n"+
+//                     "  3- Ver y modificar el carrito de compras\n"+
+//                     "  4- Finalizar compra\n"+
+//                     "  5- Ver Stock\n"+
+//                     "(Salir del simulador escribiendo \"esc\")\n\n"+
+//                     "Escriba la opción deseada").toUpperCase()
 
-//Logica del programa 
-alert(  "Simulador de E-Commerce:\n")
-let option
-//Logica del menú
-do{
-        //MENU INICIAL
-    option = prompt(" Escriba el número de la opción que desee realizar:\n"+
-                    "  1- Agregar Stock\n"+
-                    "  2- Seleccionar productos a comprar\n"+
-                    "  3- Ver y modificar el carrito de compras\n"+
-                    "  4- Finalizar compra\n"+
-                    "  5- Ver Stock\n"+
-                    "(Salir del simulador escribiendo \"esc\")\n\n"+
-                    "Escriba la opción deseada").toUpperCase()
-
-    switch(option){
-        case '1':
-        break;
-        case '2':
-        break;
-        case '3':
-        break;
-        case '4':
-        break;
-        case '5':
-        break;
-        default:
-            if(option!="ESC")
-            alert("La opcion ingresada no es valida")
-        break;
-    }
-}while(option!="ESC")
+//     switch(option){
+//         case '1':
+//         break;
+//         case '2':
+//         break;
+//         case '3':
+//         break;
+//         case '4':
+//         break;
+//         case '5':
+//         break;
+//         default:
+//             if(option!="ESC")
+//             alert("La opcion ingresada no es valida")
+//         break;
+//     }
+// }while(option!="ESC")
