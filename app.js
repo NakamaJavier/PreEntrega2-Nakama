@@ -1,29 +1,37 @@
 /////////////Definiciones de clases y métodos///////////////
 //Definicion clase de cada producto.
 class TalleCantidad{
-    constructor(talle,stock){
+    constructor(talle,cantidad){
         this.talle=talle
-        this.stock=stock
+        this.cantidad=cantidad
     }
 }
 class Producto {
     constructor (id, nombre, marca, stock, precio){
-        this.id=id;
-        this.nombre=nombre;
-        this.marca=marca;
-        this.stock = [];
+        this.id=id
+        this.nombre=nombre
+        this.marca=marca
+        this.stock = []
         for (let i = 0; i < stock.length; i++) {
-            const talleCantidad = new TalleCantidad(stock[i].talle, stock[i].cantidad);
-            this.stock.push(talleCantidad);
+            const talleCantidad = new TalleCantidad(stock[i].talle, stock[i].cantidad);//tiene que ir cantidad
+            this.stock.push(talleCantidad)
         }
         this.precio=precio;
     }
 }
-
+class ProductoCarrito {
+    constructor(id,talle,cantidad){
+        this.id=id
+        this.talle=talle
+        this.cantidad=cantidad
+    }
+}
 //Definicion de la clase de la lista de productos y los metodos que la utilizan
 class ProductHandler{
     constructor(){
         this.listaProductos = []
+        this.carritoCompra = []
+        this.precioTotal
     }
     ordenarPorTalles() {
         for(const producto of this.listaProductos){
@@ -32,7 +40,7 @@ class ProductHandler{
     }
     eliminarTalleSinStock(){
         for(const producto of this.listaProductos){
-            producto.stock=producto.stock.filter(talle=>talle.stock!==0)
+            producto.stock=producto.stock.filter(talle=>talle.cantidad!==0)
         }
     }
     //Ordena la lista de productos por ID, luego los talles de mayor a menor y ademas retira los talles con stock 0
@@ -45,29 +53,54 @@ class ProductHandler{
         const index=this.listaProductos.findIndex(producto=>producto.id==id)
         if(id!=0){
             console.log("ID:"+this.listaProductos[index].id+"\nNombre:"+this.listaProductos[index].nombre+"\nMarca:"+this.listaProductos[index].marca+"\nStock(talle:cantidad):")
-            for(let i=0;i<this.listaProductos[index].talles.length;i++){
-                console.log(this.listaProductos[index].talles[i]+":"+this.listaProductos[index].stock[i])
-            }       
+            for(let talle of this.listaProductos[index].stock)
+                console.log(talle.talle+":"+talle.cantidad)
+        }
+        else{
+            console.log("No se encontró un producto con esa ID");
+        } 
+    }
+    mostrarCatalogo(){
+        for(let i=0;i<this.listaProductos.length;i++){
+            let talles = []
+            for(let j=0;j<this.listaProductos[i].stock.length;j++){
+                talles.push(this.listaProductos[i].stock[j].talle)
+            }
+            console.log("ID:"+this.listaProductos[i].id+"\nNombre:"+this.listaProductos[i].nombre+"\nMarca:"+this.listaProductos[i].marca+"\nTalle:"+talles+"\nPrecio:"+this.listaProductos[i].precio+"\n____________________________________\n")
         }
     }
-    mostrarStocks(){
-        const cantidadProductos = this.listaProductos.length
-        for(let i=0;i<=cantidadProductos;i++){
-            this.mostrarStock(i)
-            console.log("\n")
+    mostrarCatalogoFiltrado(){
+        let option = prompt(`Indique que tipo de filtro desea realizar:\n
+        `)
+    }
+
+    calcularMontoTotal(){
+        let indexID
+        this.precioTotal=0
+        for(let productoCarrito of this.carritoCompra){
+            indexID=this.listaProductos.findIndex(producto => producto.id==productoCarrito.id)
+            this.precioTotal+=(this.listaProductos[indexID].precio*productoCarrito.cantidad)
+        }
+    }
+    consumirStock(){
+        let indexID
+        let indexTalle
+        for(let productoCarrito of this.carritoCompra){
+            indexID=this.listaProductos.findIndex(producto => producto.id==productoCarrito.id)
+            indexTalle=this.listaProductos[indexID].stock.findIndex(producto => producto.talle==productoCarrito.talle)
+            this.listaProductos[indexID].stock[indexTalle].cantidad-=productoCarrito.cantidad
         }
     }
     agregarStock(){
         let id= parseInt(prompt("Coloque el ID del producto a agregar"))
         let existencia = this.listaProductos.find(producto => producto.id==id)
-        console.log(existencia)
         if(existencia){
             //Agrega stock a un producto existente
             let talle = parseInt(prompt("Indique la talle que desee agregar el stock"))
             let cantidad =parseInt(prompt("Indique la cantidad de unidades a agregar de ese talle"))
             let talleExistencia = existencia.stock.findIndex(talleI=>talleI.talle==talle)
             if(talleExistencia!=-1)
-                existencia.stock[talleExistencia].stock+=cantidad
+                existencia.stock[talleExistencia].cantidad+=cantidad
             else{
                 const talleCantidad = new TalleCantidad(talle,cantidad);
                 existencia.stock.push(talleCantidad);
@@ -81,6 +114,69 @@ class ProductHandler{
             const cantidad = parseInt(prompt("Indique la cantidad de stock"))
             const newProduct = new Producto(id,nombre,marca,[{talle:talle,cantidad:cantidad}],precio)
             this.listaProductos.push(newProduct)
+        }
+        this.mostrarStock(id)
+    }    
+    //Funcion para elegir los productos a comprar. Posee sistema de filtrado y verificacion de dato ingresado OK
+    llenarCarrito(){
+        this.mostrarCatalogo()
+        let id
+        let indexID
+        do{
+            id = prompt("Selecciona el ID del artículo a comprar \n (Escriba filtrar para realizar un filtrado)")
+            if(id=="filtrar")
+            {
+                this.mostrarCatalogoFiltrado()
+            }
+            else{
+                if(!this.listaProductos.find(producto => producto.id==id))
+                    alert("No hay productos con esa ID")
+                else
+                    indexID = this.listaProductos.findIndex(producto=>producto.id==id)
+            }
+        }while(!this.listaProductos.find(producto => producto.id==id))
+        console.clear()
+        this.mostrarStock(id)
+        let talle
+        let indexTalle
+        do{
+            talle= parseInt(prompt("Selecione el talle deseado"))
+            if(!this.listaProductos[indexID].stock.find(producto => producto.talle===talle))
+                alert("El producto no posee ese talle en stock")
+            else
+                indexTalle = this.listaProductos[indexID].stock.findIndex(producto=>producto.talle==talle)
+        }while(!this.listaProductos[indexID].stock.find(producto => producto.talle===talle))
+        let cantidad
+        do{
+            cantidad = parseInt(prompt("Seleccione la cantidad"))
+            if(cantidad> this.listaProductos[indexID].stock[indexTalle].cantidad)
+                alert("La cantidad excede al stock disponible para ese talle")
+            if(cantidad<=0)
+                alert("La cantidad tiene que ser mayor a 0")
+        }while(cantidad> this.listaProductos[indexID].stock[indexTalle].cantidad || cantidad<=0)
+        const newCompra = new ProductoCarrito(id,talle,cantidad)
+        this.carritoCompra.push(newCompra)
+        console.clear()
+    }
+    finalizarCompra(){
+        this.calcularMontoTotal()
+        let option
+        do{
+            option = prompt(`El monto total a pagar es: $${this.precioTotal}\n    Desea finalizar la compra? Escriba "si" para aceptar, "esc" para salir`).toUpperCase()
+            if(option=="SI"){
+                this.consumirStock()
+                this.carritoCompra.splice(0,this.carritoCompra.length)
+            }
+        }while(option!="SI"&& option!="ESC")
+        
+    }
+    mostrarStocks(){
+        this.ordenarStock()
+        for(let i=0;i<this.listaProductos.length;i++){
+            console.log("ID:"+this.listaProductos[i].id+"\nNombre:"+this.listaProductos[i].nombre+"\nMarca:"+this.listaProductos[i].marca+"\nStock(talle:cantidad):")
+            for(let talle of this.listaProductos[i].stock)
+                console.log(talle.talle+":"+talle.cantidad)
+            console.log("____________________________________")
         }
     }
 }
@@ -113,32 +209,39 @@ let prod20=new Producto (20,   "Gel-Rebound",             "Asics",    [{talle:40
 let productos = new ProductHandler
 productos.listaProductos=[prod1,prod2,prod3,prod4,prod5,prod6,prod7,prod8,prod9,prod10,prod11,prod12,prod13,prod14,prod15,prod16,prod17,prod18,prod19,prod20]
 
+//Creo y cargo objetos en el array carritoCompra para hacer pruebas
+let compra1=new ProductoCarrito(12,38,2)
+let compra2=new ProductoCarrito(20,40,3)
+let compra3=new ProductoCarrito(15,39,2)
+productos.carritoCompra=[compra1,compra2,compra3]
+
 //Logica del programa 
 alert(  "Simulador de E-Commerce:\n")
 let option
 //Logica del menú
 do{
     productos.ordenarStock()
-    console.log(productos);
         //MENU INICIAL
-    option = prompt(" Escriba el número de la opción que desee realizar:\n"+
-                    "  1- Agregar Stock\n"+
-                    "  2- Seleccionar productos a comprar\n"+
-                    "  3- Ver y modificar el carrito de compras\n"+
-                    "  4- Finalizar compra\n"+
-                    "  5- Ver Stock\n"+
-                    "(Salir del simulador escribiendo \"esc\")\n\n"+
-                    "Escriba la opción deseada").toUpperCase()
+    option = prompt(`Escriba el número de la opción que desee realizar:
+        1- Agregar Stock
+        2- Seleccionar productos a comprar
+        3- Ver y modificar el carrito de compras
+        4- Finalizar compra
+        5- Ver Stock
+    (Salir del simulador escribiendo "esc")\n
+    Escriba la opción deseada`).toUpperCase()
 
     switch(option){
         case '1':
             productos.agregarStock()
         break;
         case '2':
+            productos.llenarCarrito()
         break;
         case '3':
         break;
         case '4':
+            productos.finalizarCompra()
         break;
         case '5':
             productos.mostrarStocks()
