@@ -70,8 +70,9 @@ class ProductHandler{
         }
     }
     mostrarCatalogoFiltrado(){
-        let option = prompt(`Indique que tipo de filtro desea realizar:\n
-        `)
+        alert("Opcion aun no terminada")
+        //let option = prompt(`Indique que tipo de filtro desea realizar:\n`)
+
     }
 
     calcularMontoTotal(){
@@ -117,7 +118,7 @@ class ProductHandler{
         }
         this.mostrarStock(id)
     }    
-    //Funcion para elegir los productos a comprar. Posee sistema de filtrado y verificacion de dato ingresado OK
+    //Funcion para elegir los productos a comprar. Posee sistema de verificacion de dato ingresado OK
     llenarCarrito(){
         this.mostrarCatalogo()
         let id
@@ -158,6 +159,66 @@ class ProductHandler{
         this.carritoCompra.push(newCompra)
         console.clear()
     }
+    modificarCarrito(){
+        if(this.carritoCompra.length==0)
+            alert("El carrito esta vacio")
+        else
+        {
+            for(let producto of this.carritoCompra){
+                console.log(`ID:${producto.id}
+                Talle:${producto.talle}
+                Cantidad:${producto.cantidad}`);
+            }
+            this.calcularMontoTotal()
+            console.log(`Total de la compra: $${this.precioTotal}`)
+            let id
+            let indexIDcC
+            let indexIDlC
+            let indexTalle
+            do{
+                id=prompt("Escriba el ID del producto a modificar")
+                indexIDcC = this.carritoCompra.findIndex(producto=>producto.id==id)
+                if(indexIDcC ==-1)
+                    alert("El producto del ID ingresado no se encuentra dentro del carrito")
+            }while(indexIDcC ==-1)
+            let option
+            do{
+                console.clear()
+                console.log(`ID:${this.carritoCompra[indexIDcC].id}
+                Talle:${this.carritoCompra[indexIDcC].talle}
+                Cantidad:${this.carritoCompra[indexIDcC].cantidad}`)
+                option = prompt(`Elija la opcion que desee:
+                1- Cambiar la cantidad
+                2- Eliminar el producto
+                (sale del menu con ESC)`).toUpperCase()
+                indexIDlC= this.listaProductos.findIndex(producto=>producto.id==id)
+                indexTalle = this.listaProductos[indexIDlC].stock.findIndex(producto=>producto.talle==this.carritoCompra[indexIDcC].talle)
+                switch(option){
+                    case '1':
+                        let newCantidad
+                            do{
+                                newCantidad = parseInt(prompt("Seleccione la nueva cantidad"))
+                                if(newCantidad> this.listaProductos[indexIDlC].stock[indexTalle].cantidad)
+                                    alert("La cantidad excede al stock disponible para ese talle")
+                                if(newCantidad<=0)
+                                    alert("La cantidad tiene que ser mayor a 0")
+                            }while(newCantidad> this.listaProductos[indexIDlC].stock[indexTalle].cantidad || newCantidad<=0)
+                        this.carritoCompra[indexIDcC].cantidad=newCantidad
+                        option="ESC"
+                    break;
+                    case '2':
+                        this.carritoCompra.splice(indexIDcC,1)
+                        option="ESC"
+                    break;
+                    default:
+                        if(option!="ESC")
+                            alert("No se detecto una opcion valida")
+                    break;
+                }
+            }while(option!=="ESC")
+            console.clear()
+        }
+    }
     finalizarCompra(){
         this.calcularMontoTotal()
         let option
@@ -166,6 +227,7 @@ class ProductHandler{
             if(option=="SI"){
                 this.consumirStock()
                 this.carritoCompra.splice(0,this.carritoCompra.length)
+                alert("La operacion fue un exito. Muchas gracias por su compra")
             }
         }while(option!="SI"&& option!="ESC")
         
@@ -239,6 +301,7 @@ do{
             productos.llenarCarrito()
         break;
         case '3':
+            productos.modificarCarrito()
         break;
         case '4':
             productos.finalizarCompra()
